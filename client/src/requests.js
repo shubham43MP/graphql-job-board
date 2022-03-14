@@ -43,5 +43,9 @@ async function graphqlRequest(query, variables = {}) {
     body: JSON.stringify({ query, variables }),
   });
   const body = await response.json();
+  if (body.errors) {
+    const message = body.errors.map((error) => error.message).join("\n");
+    throw new Error(message);
+  }
   return body.data;
 }
