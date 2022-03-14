@@ -66,3 +66,12 @@ export async function loadCompany(id) {
   const data = await graphqlRequest(query, { id });
   return data.company;
 }
+
+export async function createJob(input) {
+  const mutation = `
+  mutation CreateJob($input: CreateJobInput) {
+    job: createJob(input: $input) 
+  }`;
+  const data = await graphqlRequest(mutation, { input });
+  return data.job;
+}
