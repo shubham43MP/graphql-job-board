@@ -28,7 +28,7 @@ const apolloServer = new ApolloServer({
   typeDefs,
   resolvers,
   context: ({ req }) => ({
-    user: req.user,
+    user: req.user && db.users.get(req.user.sub),
   }),
 });
 async function server() {
