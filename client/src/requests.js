@@ -56,7 +56,11 @@ export async function loadCompany(id) {
     company(id: $id) {
       id,
       name,
-      description
+      description,
+      jobs {
+        id, 
+        title
+      }
     }
   }`;
   const data = await graphqlRequest(query, { id });
