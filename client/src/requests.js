@@ -49,3 +49,16 @@ async function graphqlRequest(query, variables = {}) {
   }
   return body.data;
 }
+
+export async function loadCompany(id) {
+  const query = `
+  query CompanyQuery($id: ID!){
+    company(id: $id) {
+      id,
+      name,
+      description
+    }
+  }`;
+  const data = await graphqlRequest(query, { id });
+  return data.company;
+}
