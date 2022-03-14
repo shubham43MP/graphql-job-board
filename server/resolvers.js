@@ -16,7 +16,8 @@ const Company = {
 };
 
 const Mutation = {
-  createJob: (root, { input }) => {
+  createJob: (root, { input }, context) => {
+    if (!context.user) throw new Error("Unauthorized");
     return db.jobs.create(input);
   },
 };
