@@ -46,24 +46,24 @@ export async function loadJobs() {
   return jobs;
 }
 
-export async function loadJob(id) {
-  const query = gql`
-    query JobQuery($id: ID!) {
-      job(id: $id) {
+const jobQuery = gql`
+  query JobQuery($id: ID!) {
+    job(id: $id) {
+      id
+      title
+      company {
         id
-        title
-        company {
-          id
-          name
-        }
-        description
+        name
       }
+      description
     }
-  `;
+  }
+`;
 
+export async function loadJob(id) {
   const {
     data: { job },
-  } = await client.query({ query, variables: { id } });
+  } = await client.query({ query: jobQuery, variables: { id } });
   return job;
 }
 
@@ -95,6 +95,14 @@ export async function createJob(input) {
   `;
   const {
     data: { job },
-  } = await client.mutate({ mutation, variables: { input } });
+  } = await client.mutate({
+    mutation,
+    variables: { input },
+    // UPDATE UTATION RESULT IN CATCHETO LOAD JOB
+    // update: (cache, mutationResult) => {
+    //   console.log("mutationaas", mutationResult);
+    //   cache.writeQuery({ query: jobQuery, data: mutationResult.data, variables: { id: mutationResult.data.job.id } });
+    // },
+  });
   return job;
 }

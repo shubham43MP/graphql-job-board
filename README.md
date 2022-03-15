@@ -1,3 +1,3 @@
 # GraphQL Job Board
 
-Sample application used in the GraphQL by Example course.
+1. fetchPolicy: options can bypass the cache
