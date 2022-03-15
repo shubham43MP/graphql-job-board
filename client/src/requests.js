@@ -26,39 +26,66 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-export async function loadJobs() {
-  const query = gql`
-    {
-      jobs {
-        id
-        title
-        company {
-          id
-          name
-        }
-      }
+const jobDetailFragment = gql`
+  fragment JobDetail on Job {
+    id
+    title
+    company {
+      id
+      name
     }
-  `;
-
-  const {
-    data: { jobs },
-  } = await client.query({ query });
-  return jobs;
-}
+    description
+  }
+`;
 
 const jobQuery = gql`
   query JobQuery($id: ID!) {
     job(id: $id) {
+      ...JobDetail
+    }
+  }
+  ${jobDetailFragment}
+`;
+
+const createJobMutation = gql`
+  mutation CreateJob($input: CreateJobInput) {
+    job: createJob(input: $input)
+  }
+`;
+
+const companyQuery = gql`
+  query CompanyQuery($id: ID!) {
+    company(id: $id) {
+      id
+      name
+      description
+      jobs {
+        id
+        title
+      }
+    }
+  }
+`;
+
+const jobsQuery = gql`
+  query JobsQuery {
+    jobs {
       id
       title
       company {
         id
         name
       }
-      description
     }
   }
 `;
+
+export async function loadJobs() {
+  const {
+    data: { jobs },
+  } = await client.query({ query: jobsQuery });
+  return jobs;
+}
 
 export async function loadJob(id) {
   const {
@@ -68,35 +95,17 @@ export async function loadJob(id) {
 }
 
 export async function loadCompany(id) {
-  const query = gql`
-    query CompanyQuery($id: ID!) {
-      company(id: $id) {
-        id
-        name
-        description
-        jobs {
-          id
-          title
-        }
-      }
-    }
-  `;
   const {
     data: { company },
-  } = await client.query({ query, variables: { id } });
+  } = await client.query({ query: companyQuery, variables: { id } });
   return company;
 }
 
 export async function createJob(input) {
-  const mutation = gql`
-    mutation CreateJob($input: CreateJobInput) {
-      job: createJob(input: $input)
-    }
-  `;
   const {
     data: { job },
   } = await client.mutate({
-    mutation,
+    mutation: createJobMutation,
     variables: { input },
     // UPDATE UTATION RESULT IN CATCHETO LOAD JOB
     // update: (cache, mutationResult) => {
